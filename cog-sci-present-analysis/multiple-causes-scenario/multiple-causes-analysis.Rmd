@@ -435,7 +435,6 @@ corplot1 <- ggplot(all_variable_data, aes(x = mean_pred, y = mean, color = Condi
         plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
   annotate("text", x=.25, y=.6, label= "r = .88", size = 6) 
 
-save(corplot1, file = "multiple.causes.plot.RData")
 corplot1
 ```
 
