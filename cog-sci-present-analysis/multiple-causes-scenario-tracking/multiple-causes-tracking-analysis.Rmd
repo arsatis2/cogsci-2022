@@ -29,9 +29,7 @@ library(tidyverse)
 
 ```{r loading-data, echo=FALSE}
 
-# setwd("~/Dropbox/8 and above/Emotions and Causal Learning/Analysis/cog-sci-present/multiple-causes-scenario-tracking")
-
-ecl_dat <- read_csv("../clean data/ecl_dat.csv")
+ecl_dat <- read_csv("ecl_dat.csv")
 
 ```
 
@@ -101,6 +99,10 @@ table(ecl_dat$condition)
 
 # Summary Statistics
 
+`relationXBlue`: likelihood that the blue box caused bulb to switch on. X indexes the measurement point (from 1 to 5) where the rating was collected from participants
+`relationXOrange` = likelihood that the orange box caused bulb to switch on. X indexes the measurement point (from 1 to 5) where the rating was collected from participants
+`relationXOrangeBlue` = likelihood that both boxes caused bulb to switch on. X indexes the measurement point (from 1 to 5) where the rating was collected from participants
+
 ```{r change-to-long-format}
 
 human_cause_data_t1 <- gather.keep(ecl_dat, var.to.gather = c("relation1BlueNorm", "relation1OrangeNorm", "relation1OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood") 
@@ -156,10 +158,6 @@ table1 <- ecl_dat[,key_variables1] %>%
   as.data.frame()%>%
   select(n,mean,sd,median,min,max,skew,kurtosis)
 knitr::kable(table1)
-
-# relationBlue = likelihood that blue causes bulb to switch on
-# relationOrange = likelihood that orange causes bulb to switch on
-# relationOrangeBlue = likelihood that both cause bulb to switch on
 
 ```
 

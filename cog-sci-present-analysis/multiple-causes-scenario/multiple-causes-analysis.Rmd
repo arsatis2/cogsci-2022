@@ -9,8 +9,9 @@ output:
     highlight: tango
     toc: yes
     toc_depth: 3
+    toc_float: yes
     code_folding: "hide"
-fontsize: 16pt
+fontsize: 18pt
 ---
 
 ```{r setup, include=FALSE}
@@ -32,9 +33,7 @@ library(tidyverse)
 
 ```{r loading-data, echo=FALSE}
 
-# setwd("~/Dropbox/8 and above/Emotions and Causal Learning/Analysis/cog-sci-present/multiple-causes-scenario")
-
-ecl_dat <- read_csv("../clean data/ecl_dat.csv")
+ecl_dat <- read_csv("ecl_dat.csv")
 
 ```
 
@@ -109,6 +108,13 @@ table(ecl_dat$condition)
 
 # Summary Statistics
 
+- `relationBlue`: likelihood that blue caused bulb to switch on
+- `relationOrange`: likelihood that orange caused bulb to switch on
+- `relationOrangeBlue`: likelihood that both caused bulb to switch on
+- `expBlue`: likelihood that agent expected blue to cause bulb to switch on
+- `expOrange`: likelihood that agent expected orange to cause bulb to switch on
+- `expBoth`: likelihood that agent expected both to cause bulb to switch on
+
 ```{r preparing-variables}
 # normalizing desire and knowledge variables
 ecl_dat$desire <- (ecl_dat$desire - 1)/8
@@ -143,6 +149,7 @@ human_knowledge <- human_knowledge_data %>% group_by(condition, structure)%>%
   multi_boot_standard(col="likelihood")
 ```
 
+
 ```{r histograms-of-variables, fig.height=16, fig.width=16}
 library(psych)
 
@@ -153,14 +160,6 @@ table1 <- ecl_dat[,key_variables1] %>%
   as.data.frame()%>%
   select(n,mean,sd,median,min,max,skew,kurtosis)
 knitr::kable(table1)
-
-# relationBlue = likelihood that blue causes bulb to switch on
-# relationOrange = likelihood that orange causes bulb to switch on
-# relationOrangeBlue = likelihood that both cause bulb to switch on
-# expBlue = likelihood that he expected blue to cause bulb to switch on
-# expOrange = likelihood that he expected orange to cause bulb to switch on
-# expBoth = likelihood that he expected both to cause bulb to switch on
-
 ```
 
 # Demographics
@@ -547,19 +546,17 @@ grid.draw(rbind(cbind(ggplotGrob(plot_human_cause_left), ggplotGrob(plot_human_e
 
 ## Causal Inferences
 
-_t_-tests were performed to determine whether the differences between the means of participants' causal inferences were significant across the conditions.
-
-On causal inference, participants in the emotion condition were less likely to infer that the blue box turns on the bulb ($t(127) = -3.33, p = .001$), than participants in the no-emotion condition.
+On causal inference, participants in the emotion condition were less likely to infer that the blue box turned on the bulb ($t(127) = -3.33, p = .001$), than participants in the no-emotion condition.
 ```{r testing-hypotheses-on-causal-structure-blue}
 t.test(relationBlue ~ condition, ecl_dat)
 ```
 
-On the other hand, participants in the emotion condition were more likely to infer that the orange box turns on the bulb ($t(120.63) = 3.06, p = .003$), than participants in the no-emotion condition.
+On the other hand, participants in the emotion condition were more likely to infer that the orange box turned on the bulb ($t(120.63) = 3.06, p = .003$), than participants in the no-emotion condition.
 ```{r testing-hypotheses-on-causal-structure-orange}
 t.test(relationOrange ~ condition, ecl_dat)
 ```
 
-Also, participants in the emotion condition were less likely to infer that pushing both boxes turns on the bulb ($t(100.42) = -3.51, p = .007$), than participants in the no-emotion condition.
+Also, participants in the emotion condition were less likely to infer that pushing both boxes turned on the bulb ($t(100.42) = -3.51, p = .007$), than participants in the no-emotion condition.
 ```{r testing-hypotheses-on-causal-structure-both}
 t.test(relationOrangeBlue ~ condition, ecl_dat)
 
@@ -567,19 +564,19 @@ t.test(relationOrangeBlue ~ condition, ecl_dat)
 
 ## Belief Inferences
 
-_t_-tests were also performed to determine whether the differences between the means of participants' belief inferences were significant across the conditions.
-
 On belief inference, participants in the emotion condition were more likely to infer that the agent expected the blue box to turn on the bulb ($t(125.76) = 5.09, p < .001$) than participants in the no-emotion condition.
 ```{r testing-hypotheses-on-expectation-blue}
 t.test(expBlue ~ condition, ecl_dat)
 ```
 
-However, the belief inference of participants that the agent expected the orange box to turn on the bulb did not statistically differ across conditions.
+Both conditions did not statistically differ on their inference of the agent's belief in the orange box as a causal antecedent.
+
 ```{r testing-hypotheses-on-expectation-orange}
 t.test(expOrange ~ condition, ecl_dat)
 ```
 
-Yet, participants in the emotion condition were less likely to infer that the agent expected both boxes to turn on the bulb ($t(116.91) = -3.56, p < 0.001$) than participants in the no-emotion condition.
+Participants in the emotion condition were less likely to infer that the agent expected both boxes to turn on the bulb ($t(116.91) = -3.56, p < 0.001$) than participants in the no-emotion condition.
+
 ```{r testing-hypotheses-on-expectation-both}
 t.test(expBoth ~ condition, ecl_dat)
 
@@ -587,7 +584,7 @@ t.test(expBoth ~ condition, ecl_dat)
 
 ## Desire Inferences
 
-With regards to desire inference, participants' inference that the desire of the agent was to turn on the bulb did not statistically differ across conditions.
+With regards to desire inference, it did not statistically differ across conditions. From the means, we can see that participants in both conditions inferred that the agent likely desired to turn on the bulb.
 ```{r testing-desire-inferences}
 t.test(desire ~ condition, ecl_dat)
 ```
@@ -596,14 +593,14 @@ t.test(desire ~ condition, ecl_dat)
 ecl_dat %>%
   group_by(condition) %>%
   summarise(
-    knowledge1 = paste0(round(mean(desire, na.rm = T),2)," (",round(sd(desire, na.rm = T),2), ")")
+    desire = paste0(round(mean(desire, na.rm = T),2)," (",round(sd(desire, na.rm = T),2), ")")
   )
 ```
 
 
 ## Knowledge Inferences
 
-Finally, with regards to knowledge inference, participants in the emotion condition were less likely to infer that the agent was knowledgeable about how to turn on the bulb ($t(116.43) = -5.33, p < .001$) than participants in the no-emotion condition.
+Finally, with regards to knowledge inference, participants in the emotion condition were less likely to infer that the agent was knowledgeable about how to turn on the bulb ($t(116.43) = -5.33, p < .001$) than participants in the no-emotion condition. This makes sense as the agent in the emotion condition signalled that he failed his initial action (pushing the blue box).
 ```{r testing-knowledge-inferences}
 t.test(knowledge1 ~ condition, ecl_dat)
 ```
@@ -612,6 +609,6 @@ t.test(knowledge1 ~ condition, ecl_dat)
 ecl_dat %>%
   group_by(condition) %>%
   summarise(
-    knowledge1 = paste0(round(mean(knowledge1, na.rm = T),2)," (",round(sd(knowledge1, na.rm = T),2), ")")
+    knowledge = paste0(round(mean(knowledge1, na.rm = T),2)," (",round(sd(knowledge1, na.rm = T),2), ")")
   )
 ```
