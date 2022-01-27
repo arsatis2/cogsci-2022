@@ -1,0 +1,361 @@
+---
+title: "Analysis of Multiple-Causes Tracking Scenario (Follow-up from Study 1)"
+author: "Dennis and Zheng Yong"
+output:
+  html_document:
+    df_print: paged
+    number_sections: yes
+    theme: readable
+    highlight: tango
+    toc: yes
+    toc_depth: 3
+    code_folding: "hide"
+fontsize: 16pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r loading-libraries-and-helper-functions, echo= F}
+
+library(ggplot2)
+library(langcog)
+library(dthelper)
+library(readr)
+library(tidyverse)
+
+```
+
+```{r loading-data, echo=FALSE}
+
+# setwd("~/Dropbox/8 and above/Emotions and Causal Learning/Analysis/cog-sci-present/multiple-causes-scenario-tracking")
+
+ecl_dat <- read_csv("../clean data/ecl_dat.csv")
+
+```
+
+# Participant Exclusion
+
+> Number of flat responders:
+
+```{r removing-participants-based-on-criteria, eval = T}
+# number of flat responders
+sum(ecl_dat$flat)
+# remove flat responders
+ecl_dat <- ecl_dat[!ecl_dat$flat, ]
+```
+
+> Number of participants who failed first attention check:
+
+```{r removing-participants-based-on-att1, eval = T}
+# number who failed attention1 check
+sum(ecl_dat$attention1 != 2) 
+# remove those who failed attention1 check
+ecl_dat <- ecl_dat[ecl_dat$attention1=="2",]
+```
+
+> Number of participants who failed second attention check:
+
+```{r removing-participants-based-on-att2, eval = T}
+# number who failed attention2 check
+sum(!(ecl_dat$attentionOrange == 0 & ecl_dat$attentionBlue == 0 & ecl_dat$attentionBulb == 1)) 
+pass_attention2 <- (ecl_dat$attentionOrange == 0 & ecl_dat$attentionBlue == 0 & ecl_dat$attentionBulb == 1)
+# remove those who failed attention2 check
+ecl_dat <- ecl_dat[pass_attention2, ]
+```
+
+> Number of outliers for total time taken:
+
+```{r removing-participants-based-on-time, eval = T}
+# outlier for Total Time taken for survey
+rt_range <- 3*sd(ecl_dat$totalRT)
+slow <- which(ecl_dat$totalRT > mean(ecl_dat$totalRT,na.rm = T) + rt_range)
+fast <- which(ecl_dat$totalRT < mean(ecl_dat$totalRT,na.rm = T) - rt_range)
+
+# number of outliers for Total Time taken for survey
+length(slow)   
+length(fast)
+
+# remove outliers
+ecl_dat <- ecl_dat[-slow,]
+```
+
+> Number of participants who failed anti-bot verification:
+
+```{r removing-participants-based-on-botCheck, eval = T}
+n_fails <- which(ecl_dat$nFails > 3)
+# number who failed bot check (more than 3 times)
+length(n_fails) 
+```
+
+> Number of remaining participants after data cleaning:
+
+```{r participants-after-all-cleaning, eval = T}
+# number of participants in each condition (after exclusions)
+ecl_dat$condition <- relabel(ecl_dat$condition,
+                             from = c("condition 2","condition 1"),
+                             to = c("no-emotion", "emotion"))
+table(ecl_dat$condition) 
+```
+
+# Summary Statistics
+
+```{r change-to-long-format}
+
+human_cause_data_t1 <- gather.keep(ecl_dat, var.to.gather = c("relation1BlueNorm", "relation1OrangeNorm", "relation1OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood") 
+
+human_cause_data_t2 <- gather.keep(ecl_dat, var.to.gather = c("relation2BlueNorm", "relation2OrangeNorm", "relation2OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood")
+
+human_cause_data_t3 <- gather.keep(ecl_dat, var.to.gather = c("relation3BlueNorm", "relation3OrangeNorm", "relation3OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood")
+
+human_cause_data_t4 <- gather.keep(ecl_dat, var.to.gather = c("relation4BlueNorm", "relation4OrangeNorm", "relation4OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood")
+
+human_cause_data_t5 <- gather.keep(ecl_dat, var.to.gather = c("relation5BlueNorm", "relation5OrangeNorm", "relation5OrangeBlueNorm"), keep = c("id", "condition"), key = "structure",value="likelihood")
+
+```
+
+
+```{r compute-confidence-intervals-via-bootstrapping}
+set.seed(100)
+
+human_cause_t1 <- human_cause_data_t1 %>% group_by(condition, structure) %>%
+  multi_boot_standard(col="likelihood") %>%
+  mutate(Structure = factor(structure, levels = c("relation1BlueNorm", "relation1OrangeNorm", "relation1OrangeBlueNorm"), labels = c("Blue Box", "Orange Box", "Both Boxes")))
+
+human_cause_t2 <- human_cause_data_t2 %>% group_by(condition, structure) %>%
+  multi_boot_standard(col="likelihood") %>%
+  mutate(Structure = factor(structure, levels = c("relation2BlueNorm", "relation2OrangeNorm", "relation2OrangeBlueNorm"), labels = c("Blue Box", "Orange Box", "Both Boxes")))
+
+human_cause_t3 <- human_cause_data_t3 %>% group_by(condition, structure) %>%
+  multi_boot_standard(col="likelihood") %>%
+  mutate(Structure = factor(structure, levels = c("relation3BlueNorm", "relation3OrangeNorm", "relation3OrangeBlueNorm"), labels = c("Blue Box", "Orange Box", "Both Boxes")))
+
+human_cause_t4 <- human_cause_data_t4 %>% group_by(condition, structure) %>%
+  multi_boot_standard(col="likelihood") %>%
+  mutate(Structure = factor(structure, levels = c("relation4BlueNorm", "relation4OrangeNorm", "relation4OrangeBlueNorm"), labels = c("Blue Box", "Orange Box", "Both Boxes")))
+
+human_cause_t5 <- human_cause_data_t5 %>% group_by(condition, structure) %>%
+  multi_boot_standard(col="likelihood") %>%
+  mutate(Structure = factor(structure, levels = c("relation5BlueNorm", "relation5OrangeNorm", "relation5OrangeBlueNorm"), labels = c("Blue Box", "Orange Box", "Both Boxes")))
+
+
+```
+
+```{r histograms-of-variables, fig.height=14, fig.width=14}
+library(psych)
+
+key_variables1 <- c("relation1BlueNorm", "relation1OrangeNorm", "relation1OrangeBlueNorm",
+                    "relation2BlueNorm", "relation2OrangeNorm", "relation2OrangeBlueNorm",
+                    "relation3BlueNorm", "relation3OrangeNorm", "relation3OrangeBlueNorm",
+                    "relation4BlueNorm", "relation4OrangeNorm", "relation4OrangeBlueNorm",
+                    "relation5BlueNorm", "relation5OrangeNorm", "relation5OrangeBlueNorm")
+
+table1 <- ecl_dat[,key_variables1] %>%
+  describe()%>%
+  as.data.frame()%>%
+  select(n,mean,sd,median,min,max,skew,kurtosis)
+knitr::kable(table1)
+
+# relationBlue = likelihood that blue causes bulb to switch on
+# relationOrange = likelihood that orange causes bulb to switch on
+# relationOrangeBlue = likelihood that both cause bulb to switch on
+
+```
+
+# Demographics
+
+> Gender of participants:
+
+```{r demographics}
+table(ecl_dat$gender)
+```
+
+> Proportion of females amongst participants:
+
+```{r demographics-proportion}
+# proportion of females
+table(ecl_dat$gender)[[1]]/length(ecl_dat$gender)
+```
+
+> Mean and SD for age amongst participants:
+
+```{r demographics-age}
+mean(ecl_dat$age,na.rm = T)
+sd(ecl_dat$age,na.rm = T)
+```
+
+> Primary language of participants:
+
+```{r demographics-language}
+table(ecl_dat$language)
+```
+
+# Comparing Model Predictions to Human Data
+
+```{r wrangling-data-across-time}
+
+human_cause_t1$time <- 1
+human_cause_t2$time <- 2
+human_cause_t3$time <- 3
+human_cause_t4$time <- 4
+human_cause_t5$time <- 5
+
+human_tracking <- human_cause_t1 %>%
+  full_join(human_cause_t2)%>%
+  full_join(human_cause_t3)%>%
+  full_join(human_cause_t4)%>%
+  full_join(human_cause_t5)
+
+human_tracking$Condition <- factor(human_tracking$condition,
+                                   levels = c("emotion", "no-emotion"),
+                                   labels = c("Emotion", "No Emotion"))
+
+human_tracking$Structure <- factor(human_tracking$Structure,
+                                   levels = c("Blue Box", "Orange Box", "Both Boxes"))
+
+model_tracking = data.frame(
+  Structure = c("Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes",
+                "Blue Box", "Orange Box", "Both Boxes"),
+  condition = c("no-emotion", "no-emotion","no-emotion",
+                "no-emotion", "no-emotion","no-emotion",
+                "no-emotion", "no-emotion","no-emotion",
+                "no-emotion", "no-emotion","no-emotion",
+                "no-emotion", "no-emotion","no-emotion",
+                "emotion", "emotion","emotion",
+                "emotion", "emotion","emotion",
+                "emotion", "emotion","emotion",
+                "emotion", "emotion","emotion",
+                "emotion", "emotion","emotion"),
+  ci_lower = c(0.347, 0.283, 0.285,
+               0.417975, 0.205   , 0.292 ,
+               0.13 , 0.312, 0.475,
+               0.079, 0.275, 0.566,
+               0.018   , 0.293975, 0.622,
+               0.352   , 0.278   , 0.281975,
+               0.443, 0.185, 0.289,
+               0.248975, 0.325   , 0.342,
+               0.26 , 0.318, 0.335,
+               0.076   , 0.405975, 0.438 
+               ),
+  ci_upper = c(0.406, 0.336, 0.343,
+               0.479, 0.255, 0.352,
+               0.177, 0.372, 0.539,
+               0.117, 0.334, 0.629,
+               0.037025, 0.35    , 0.679025,
+               0.41 , 0.335, 0.341,
+               0.506, 0.235, 0.347,
+               0.304, 0.381, 0.399,
+               0.317, 0.377, 0.394,
+               0.113   , 0.466025, 0.499 
+               ),
+  mean = c(0.376,    0.310125, 0.313875,
+           0.44825,  0.230125, 0.321625,
+           0.15275, 0.34275, 0.5045,
+           0.098125, 0.304375, 0.5975,
+           0.0275, 0.3215, 0.651,
+           0.380625, 0.30675 , 0.312625,
+           0.474 ,   0.209375, 0.316625,
+           0.277875 ,0.353,    0.369125,
+           0.28775,  0.347875, 0.364375,
+           0.0955 ,  0.436125, 0.468375
+           ),
+  time = c(1,1,1,
+           2,2,2,
+           3,3,3,
+           4,4,4,
+           5,5,5,
+           1,1,1,
+           2,2,2,
+           3,3,3,
+           4,4,4,
+           5,5,5)
+)
+
+model_tracking$Condition <- factor(model_tracking$condition,
+                                   levels = c("emotion", "no-emotion"),
+                                   labels = c("Emotion", "No Emotion"))
+
+model_tracking$Structure <- factor(model_tracking$Structure,
+                                   levels = c("Blue Box", "Orange Box", "Both Boxes"))
+
+human_tracking$Subject <- "Human"
+model_tracking$Subject <- "Model"
+cause_time_data <- full_join(human_tracking, model_tracking)
+cause_time_data$time <- cause_time_data$time + c( rep(.1,30),  rep(-.1,30))
+```
+## Correlation and Scatterplot
+
+The correlation between our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized) are shown below:
+```{r computing-correlation}
+cause_cor_data <- cause_time_data
+cause_cor_data$time <- cause_cor_data$time -c( rep(.1,30),  rep(-.1,30))
+cause_cor_data$id <- paste(cause_cor_data$Condition, cause_cor_data$Structure, cause_cor_data$time)
+
+model_cor_data <- filter(cause_cor_data, Subject=="Model")
+model_cor_data$pred <-  model_cor_data$mean
+model_cor_data$pred_lower <-  model_cor_data$ci_lower
+model_cor_data$pred_upper <-  model_cor_data$ci_upper
+human_cor_data <- filter(cause_cor_data, Subject=="Human")
+human_cor_data$actual <-  human_cor_data$mean
+human_cor_data$actual_lower <-  human_cor_data$ci_lower
+human_cor_data$actual_upper <-  human_cor_data$ci_upper
+
+cor_data <- full_join(model_cor_data[,c("id","pred","Condition","pred_lower","pred_upper")],human_cor_data[,c("id","actual", "condition","actual_lower","actual_upper")], key="id")
+# overall correlation
+cor.test(cor_data$pred,cor_data$actual)
+
+# correlation within emotion condition
+cor.test(cor_data$pred[cor_data$condition =="emotion"], cor_data$actual[cor_data$condition =="emotion"])
+
+# correlation within no-emotion condition
+cor.test(cor_data$pred[cor_data$condition =="no-emotion"], cor_data$actual[cor_data$condition =="no-emotion"])
+```
+
+The scatterplot below shows our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized):
+```{r plotting-scatterplot, fig.height = 8, fig.width=8}
+corplot_tracking <- ggplot(cor_data, aes(x = pred, y = actual, color = Condition, shape = Condition))+
+  geom_point(size=3.5) +
+  geom_errorbar(data = cor_data, aes(x = pred, ymin=actual_lower, ymax=actual_upper), width = .04, size = .4)+
+  geom_errorbarh(data = cor_data, aes(y = actual, xmin=pred_lower, xmax=pred_upper), height = .04, size = .4)+
+  geom_abline(intercept = 0, slope = 1,linetype = 2) +
+  xlim(0, .8) +
+  ylim(0,.8)+
+  coord_fixed(ratio = 1)+
+  ylab("Human Ratings")+
+  xlab("Model Predictions")+
+  ggtitle("Multiple-Causes Tracking (Study 1)")+
+  theme_bw()+
+    theme(text = element_text(size = 20),
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+  annotate("text", x=.25, y=.6, label= "r = .75", size = 6) 
+
+corplot_tracking
+```
+
+
+## Plotting Human-Model Comparisons across Measurement Points
+
+The line graphs below compares our model's predictions (normalized) on causal inference against participants' ratings (normalized). Predictions and ratings for the emotion condition are shown on the top row, whereas predictions and ratings for the no-emotion condition are illustrated on the bottom row.
+```{r plotting-tracking-plot, fig.height = 8, fig.width=12}
+tracking.plot <- ggplot(data=cause_time_data, aes(x=time, y=mean, group=Subject, color=Subject, shape=Subject)) +
+  geom_line() +
+  geom_point(size=3)+
+  geom_errorbar( data = cause_time_data, aes(x = time,ymin=ci_lower, ymax=ci_upper, group=Subject), width = .5, size = .5)+
+  facet_grid(~Condition ~Structure)+
+  xlab("Measurement Points")+
+  ylab("Causal Ratings")+
+  theme_bw() +
+  theme(text = element_text(size = 16),
+        plot.title = element_text(face = "bold", size = 16, hjust = 0.5))
+tracking.plot
+```
+
