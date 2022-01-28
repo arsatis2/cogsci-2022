@@ -108,12 +108,14 @@ table(ecl_dat$condition)
 
 # Summary Statistics
 
-- `relationBlue`: likelihood that blue caused bulb to switch on
-- `relationOrange`: likelihood that orange caused bulb to switch on
-- `relationOrangeBlue`: likelihood that both caused bulb to switch on
-- `expBlue`: likelihood that agent expected blue to cause bulb to switch on
-- `expOrange`: likelihood that agent expected orange to cause bulb to switch on
-- `expBoth`: likelihood that agent expected both to cause bulb to switch on
+- `relationBlue`: likelihood that blue caused bulb to light up
+- `relationOrange`: likelihood that orange caused bulb to light up
+- `relationOrangeBlue`: likelihood that both caused bulb to light up
+- `expBlue`: likelihood that agent expected blue to cause bulb to light up
+- `expOrange`: likelihood that agent expected orange to cause bulb to light up
+- `expBoth`: likelihood that agent expected both to cause bulb to light up
+- `desire`: likelihood that agent desired to bulb to light up
+- `knowledge`: likelihood that agent knew how to turn on the bulb
 
 ```{r preparing-variables}
 # normalizing desire and knowledge variables
@@ -195,14 +197,15 @@ table(ecl_dat$language)
 
 The bar graphs shows participants' causal inferences for:
 
-* (blue bar) pushing the blue box causes the bulb to light up.
-* (orange bar) pushing the orange box causes the bulb to light up.
-* (green bar) pushing both boxes to cause the bulb to light up.
+* the hypothesis that pushing the blue box caused the bulb to light up (blue bar).
+* the hypothesis that pushing the orange box caused the bulb to light up (orange bar).
+* the hypothesis that pushing both boxes caused the bulb to light up (green bar).
 
-The bar graphs on the left shows the likelihood ratings of participants in the emotion (experimental) condition, whereas the bar graphs on the right shows the likelihood ratings of participants in the no emotion (control) condition.
+The bar graphs on the left shows the mean likelihood ratings (normalized) of participants in the emotion condition, whereas the bar graphs on the right shows the mean likelihood ratings (normalized) of participants in the no emotion condition. Error bars represent 95% confidence intervals.
+
 ```{r causal-structure-graph,fig.width=8, fig.height=6}
 
-human_cause$Structure <- factor(human_cause$structure, labels = c("Blue Box", "Orange Box", "Both Boxes"), levels = c("relationBlueNorm", "relationOrangeNorm", "relationOrangeBlueNorm"))
+human_cause$Hypothesis <- factor(human_cause$structure, labels = c("Blue Box", "Orange Box", "Both Boxes"), levels = c("relationBlueNorm", "relationOrangeNorm", "relationOrangeBlueNorm"))
 
 human_cause$Condition <- as.numeric(relabel(human_cause$condition,
                                    from = c("emotion","no-emotion"),
@@ -223,9 +226,9 @@ breaks <- unique(human_cause$Condition)
 colorBlindGrey3   <- c("#0072B2", "#E69F00", "#009E73")
 
 # for future graphing purposes
-plot_human_cause_left <- ggplot(human_cause, aes(x = Condition, y = mean, fill = Structure)) + 
+plot_human_cause_left <- ggplot(human_cause, aes(x = Condition, y = mean, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = human_cause, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = human_cause, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   ylim(0,.7) +
   theme_bw() + xlab("")+
@@ -237,9 +240,9 @@ plot_human_cause_left <- ggplot(human_cause, aes(x = Condition, y = mean, fill =
    theme(legend.position="none") +
   ggtitle("Causal Inference")
 
-plot_human_cause <- ggplot(human_cause, aes(x = Condition, y = mean, fill = Structure)) + 
+plot_human_cause <- ggplot(human_cause, aes(x = Condition, y = mean, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = human_cause, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = human_cause, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   ylim(0,.7) +
   theme_bw() + xlab("")+
@@ -258,14 +261,15 @@ plot_human_cause
 
 The bar graphs shows participants' belief inferences for:
 
-* (blue bar) the agent believing that pushing the blue box causes the bulb to light up.
-* (orange bar) the agent believing that pushing the orange box causes the bulb to light up.
-* (green bar) the agent believing that pushing both boxes to cause the bulb to light up.
+* the hypothesis that the agent believed that pushing the blue box would turn on the bulb (blue bar).
+* the hypothesis that the agent believed that pushing the orange box would turn on the bulb (orange bar).
+* the hypothesis that the agent believed that pushing both boxes would turn on the bulb (green bar).
 
-The bar graphs on the left shows the likelihood ratings of participants in the emotion (experimental) condition, whereas the bar graphs on the right shows the likelihood ratings of participants in the no emotion (control) condition.
+The bar graphs on the left shows the mean likelihood ratings (normalized) of participants in the emotion condition, whereas the bar graphs on the right shows the mean likelihood ratings (normalized) of participants in the no emotion condition. Error bars represent 95% confidence intervals.
+
 ```{r expectation-graph,fig.width=8, fig.height=6}
 
-human_expectation$Structure <- factor(human_expectation$structure, labels = c("Blue Box", "Orange Box","Both Boxes"), levels = c("expBlueNorm", "expOrangeNorm","expBothNorm"))
+human_expectation$Hypothesis <- factor(human_expectation$structure, labels = c("Blue Box", "Orange Box","Both Boxes"), levels = c("expBlueNorm", "expOrangeNorm","expBothNorm"))
 
 human_expectation$Condition <- as.numeric(relabel(human_expectation$condition,
                                    from = c("emotion","no-emotion"),
@@ -285,9 +289,9 @@ breaks <- unique(human_expectation$Condition)
 
 colorBlindGrey3   <- c("#0072B2", "#E69F00", "#009E73")
 
-plot_human_expectation <- ggplot(human_expectation, aes(x = Condition, y = mean, fill = Structure)) + 
+plot_human_expectation <- ggplot(human_expectation, aes(x = Condition, y = mean, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = human_expectation, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = human_expectation, aes(x = Condition,ymin=ci_lower, ymax=ci_upper, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   ylim(0,.7) +
   theme_bw() + xlab("")+
@@ -318,7 +322,7 @@ human_cause$key <- c("w1e","w3e","w2e",
 model_cause <- data.frame(
   condition = c("emotion","emotion","emotion",
                 "no-emotion","no-emotion","no-emotion"),
-  Structure = c("Blue Box",  "Orange Box","Both Boxes",
+  Hypothesis = c("Blue Box",  "Orange Box","Both Boxes",
                 "Blue Box",  "Orange Box","Both Boxes"),
   ci_lower_pred = c(0.076   , 0.405975, 0.438,
                     0.018   , 0.293975, 0.622
@@ -346,7 +350,7 @@ human_expectation$key <- c("b1e","b3e","b2e",
 model_expectation <- data.frame(
   condition = c("emotion","emotion","emotion",
                 "no-emotion","no-emotion","no-emotion"),
-  Structure = c("Blue Box", "Orange Box", "Both Boxes",
+  Hypothesis = c("Blue Box", "Orange Box", "Both Boxes",
                 "Blue Box", "Orange Box", "Both Boxes"),
   ci_lower_pred = c(0.391, 0.253, 0.274,
                     0.057, 0.241, 0.63
@@ -404,19 +408,19 @@ model_variable_data <- model_desire %>%
   full_join(model_knowledge)%>%
   full_join(model_cause)
 
-all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","Structure","labels","condition"))
+all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","Hypothesis","labels","condition"))
 
 all_variable_data$Condition <-factor(all_variable_data$condition,
                                      levels=c("emotion","no-emotion"),
                                      labels = c("Emotion","No Emotion"))
 ```
 
-The correlation between our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized) are shown below:
+The correlation between our model's predictions on causal structure, belief, desire, and knowledge against participants' mean ratings (normalized) are shown below:
 ```{r computing-correlation}
 cor.test(all_variable_data$mean, all_variable_data$mean_pred)
 ```
 
-The scatterplot below shows our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized):
+The scatter-plot below plots our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (normalized). The error bars represent 95% confidence intervals):
 ```{r plotting-scatterplot, fig.height=8, fig.width=8}
 corplot1 <- ggplot(all_variable_data, aes(x = mean_pred, y = mean, color = Condition, shape = Condition))+
   geom_point(size=3.5) +
@@ -438,12 +442,12 @@ corplot1 <- ggplot(all_variable_data, aes(x = mean_pred, y = mean, color = Condi
 corplot1
 ```
 
-## Barplots Comparing Causal and Belief Inferences
+## Bar Graphs Comparing Causal and Belief Inferences
 
-The barplots below compares our model's predictions (normalized) on causal and belief inference against participants' ratings (normalized). Participants' ratings are shown as the top row of barplots, whereas our model's predictions are illustrated on the bottom row.
+The bar graphs below compares our model's predictions on causal and belief inference against mean participants' ratings (normalized). The error bars represent 95% confidence intervals. Participants' ratings are shown on the top row of bar graphs, whereas our model's predictions are illustrated on the bottom row.
 ```{r causal-structure-graph-model}
 
-model_cause$Structure <- factor(model_cause$Structure, labels = c("Blue Box", "Orange Box", "Both Boxes"), levels = c("Blue Box", "Orange Box", "Both Boxes"))
+model_cause$Hypothesis <- factor(model_cause$Hypothesis, labels = c("Blue Box", "Orange Box", "Both Boxes"), levels = c("Blue Box", "Orange Box", "Both Boxes"))
 
 model_cause$Condition <- as.numeric(relabel(model_cause$condition,
                                    from = c("emotion","no-emotion"),
@@ -464,9 +468,9 @@ breaks <- unique(model_cause$Condition)
 colorBlindGrey3   <- c("#0072B2", "#E69F00", "#009E73")
 
 # for future graphing purposes
-plot_model_cause_left <- ggplot(model_cause, aes(x = Condition, y = mean_pred, fill = Structure)) + 
+plot_model_cause_left <- ggplot(model_cause, aes(x = Condition, y = mean_pred, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = model_cause, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = model_cause, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   theme_bw() + xlab("")+
   scale_x_reverse(breaks=breaks, labels=c( "Emotion","No Emotion")) +
@@ -477,9 +481,9 @@ plot_model_cause_left <- ggplot(model_cause, aes(x = Condition, y = mean_pred, f
    theme(legend.position="none") +
   ggtitle("Causal Inference")
 
-plot_model_cause <- ggplot(model_cause, aes(x = Condition, y = mean_pred, fill = Structure)) + 
+plot_model_cause <- ggplot(model_cause, aes(x = Condition, y = mean_pred, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = model_cause, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = model_cause, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   ylim(0,.7) +
   theme_bw() + xlab("")+
@@ -495,7 +499,7 @@ plot_model_cause <- ggplot(model_cause, aes(x = Condition, y = mean_pred, fill =
 
 ```{r expectation-graph-model}
 
-model_expectation$Structure <- factor(model_expectation$Structure, labels = c("Blue Box", "Orange Box","Both Boxes"), levels = c("Blue Box", "Orange Box","Both Boxes"))
+model_expectation$Hypothesis <- factor(model_expectation$Hypothesis, labels = c("Blue Box", "Orange Box","Both Boxes"), levels = c("Blue Box", "Orange Box","Both Boxes"))
 
 model_expectation$Condition <- as.numeric(relabel(model_expectation$condition,
                                    from = c("emotion","no-emotion"),
@@ -515,9 +519,9 @@ breaks <- unique(model_expectation$Condition)
 
 colorBlindGrey3   <- c("#0072B2", "#E69F00", "#009E73")
 
-plot_model_expectation <- ggplot(model_expectation, aes(x = Condition, y = mean_pred, fill = Structure)) + 
+plot_model_expectation <- ggplot(model_expectation, aes(x = Condition, y = mean_pred, fill = Hypothesis)) + 
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar( data = model_expectation, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Structure), position=position_dodge(.9), width = .5, size = .5)+
+  geom_errorbar( data = model_expectation, aes(x = Condition,ymin=ci_lower_pred, ymax=ci_upper_pred, fill= Hypothesis), position=position_dodge(.9), width = .5, size = .5)+
   ylab("Likelihood Ratings")  +
   ylim(0,.7) +
   theme_bw() + xlab("")+
@@ -545,17 +549,17 @@ grid.draw(rbind(cbind(ggplotGrob(plot_human_cause_left), ggplotGrob(plot_human_e
 
 ## Causal Inferences
 
-On causal inference, participants in the emotion condition were less likely to infer that the blue box turned on the bulb ($t(127) = -3.33, p = .001$), than participants in the no-emotion condition.
+Participants in the emotion condition were less likely to infer that the blue box turned on the bulb ($t(127) = -3.33, p = .001$), than participants in the no-emotion condition. This is consistent with our postulation (See General Discussion of main paper) that participants in the no emotion condition were less likely to discount the "blue box" hypothesis as they were less motivated to explain the absence of an outcome compared to the participants in the emotion condition who were motivated to explain the agent's failure.
 ```{r testing-hypotheses-on-causal-structure-blue}
 t.test(relationBlue ~ condition, ecl_dat)
 ```
 
-On the other hand, participants in the emotion condition were more likely to infer that the orange box turned on the bulb ($t(120.63) = 3.06, p = .003$), than participants in the no-emotion condition.
+As expected, participants in the emotion condition were more likely to infer that the orange box turned on the bulb ($t(120.63) = 3.06, p = .003$), than participants in the no-emotion condition. We explained that participants in the emotion condition saw the agent's first action (pushing blue box) as a mistake and hence, gave higher likelihood to the other box (orange box).
 ```{r testing-hypotheses-on-causal-structure-orange}
 t.test(relationOrange ~ condition, ecl_dat)
 ```
 
-Also, participants in the emotion condition were less likely to infer that pushing both boxes turned on the bulb ($t(100.42) = -3.51, p = .007$), than participants in the no-emotion condition.
+Also, participants in the emotion condition were less likely to infer that pushing both boxes turned on the bulb ($t(100.42) = -3.51, p = .007$), than participants in the no-emotion condition. We explained that participants in the no-emotion condition assumed that both of the agent's actions were intended and hence, inferred through the agent's knowledge that both boxes were causally important to turn on the bulb.
 ```{r testing-hypotheses-on-causal-structure-both}
 t.test(relationOrangeBlue ~ condition, ecl_dat)
 
@@ -563,7 +567,7 @@ t.test(relationOrangeBlue ~ condition, ecl_dat)
 
 ## Belief Inferences
 
-On belief inference, participants in the emotion condition were more likely to infer that the agent expected the blue box to turn on the bulb ($t(125.76) = 5.09, p < .001$) than participants in the no-emotion condition.
+On belief inference, participants in the emotion condition were more likely to infer that the agent expected the blue box to turn on the bulb ($t(125.76) = 5.09, p < .001$) than participants in the no-emotion condition. This is consistent with our interpretation that participants in the emotion condition inferred that the agent expected that pushing the blue box would turn on the bulb, hence leading to his initial failed action.
 ```{r testing-hypotheses-on-expectation-blue}
 t.test(expBlue ~ condition, ecl_dat)
 ```
@@ -574,7 +578,7 @@ Both conditions did not statistically differ on their inference of the agent's b
 t.test(expOrange ~ condition, ecl_dat)
 ```
 
-Participants in the emotion condition were less likely to infer that the agent expected both boxes to turn on the bulb ($t(116.91) = -3.56, p < 0.001$) than participants in the no-emotion condition.
+Participants in the emotion condition were less likely to infer that the agent expected both boxes to turn on the bulb ($t(116.91) = -3.56, p < 0.001$) than participants in the no-emotion condition. Again, this is consistent with the interpretation that the participants inferred the agent's intention to push box boxes from the beginning.
 
 ```{r testing-hypotheses-on-expectation-both}
 t.test(expBoth ~ condition, ecl_dat)
@@ -588,6 +592,7 @@ With regards to desire inference, it did not statistically differ across conditi
 t.test(desire ~ condition, ecl_dat)
 ```
 
+These ratings describe the non-normalized desire ratings collected on a Likert scale (from 1 to 9).
 ```{r descriptives-for-desire-inferences}
 ecl_dat %>%
   group_by(condition) %>%
@@ -603,7 +608,7 @@ Finally, with regards to knowledge inference, participants in the emotion condit
 ```{r testing-knowledge-inferences}
 t.test(knowledge1 ~ condition, ecl_dat)
 ```
-
+These ratings describe the non-normalized knowledge ratings collected on a Likert scale (from 1 to 9).
 ```{r descriptives-for-knowledge-inferences}
 ecl_dat %>%
   group_by(condition) %>%

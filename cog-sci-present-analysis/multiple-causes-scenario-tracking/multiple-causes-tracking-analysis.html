@@ -736,7 +736,7 @@ pre code {
 <span id="cb32-96"><a href="#cb32-96" aria-hidden="true" tabindex="-1"></a>cause_time_data<span class="sc">$</span>time <span class="ot">&lt;-</span> cause_time_data<span class="sc">$</span>time <span class="sc">+</span> <span class="fu">c</span>( <span class="fu">rep</span>(.<span class="dv">1</span>,<span class="dv">30</span>),  <span class="fu">rep</span>(<span class="sc">-</span>.<span class="dv">1</span>,<span class="dv">30</span>))</span></code></pre></div>
 <div id="correlation-and-scatterplot" class="section level2" number="4.1">
 <h2 number="4.1"><span class="header-section-number">4.1</span> Correlation and Scatterplot</h2>
-<p>The correlation between our model’s predictions (normalized) on causal structure, belief, desire, and knowledge against participants’ ratings (normalized) are shown below:</p>
+<p>The correlation between our model’s predictions on causal structure, belief, desire, and knowledge against mean participants’ ratings (normalized) are shown below:</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>cause_cor_data <span class="ot">&lt;-</span> cause_time_data</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>cause_cor_data<span class="sc">$</span>time <span class="ot">&lt;-</span> cause_cor_data<span class="sc">$</span>time <span class="sc">-</span><span class="fu">c</span>( <span class="fu">rep</span>(.<span class="dv">1</span>,<span class="dv">30</span>),  <span class="fu">rep</span>(<span class="sc">-</span>.<span class="dv">1</span>,<span class="dv">30</span>))</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>cause_cor_data<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">paste</span>(cause_cor_data<span class="sc">$</span>Condition, cause_cor_data<span class="sc">$</span>Structure, cause_cor_data<span class="sc">$</span>time)</span>
@@ -764,6 +764,7 @@ pre code {
 ## sample estimates:
 ##       cor 
 ## 0.7463788</code></pre>
+<p>This is the correlation comparing the human-ratings to model predictions for the emotion condition:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># correlation within emotion condition</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(cor_data<span class="sc">$</span>pred[cor_data<span class="sc">$</span>condition <span class="sc">==</span><span class="st">&quot;emotion&quot;</span>], cor_data<span class="sc">$</span>actual[cor_data<span class="sc">$</span>condition <span class="sc">==</span><span class="st">&quot;emotion&quot;</span>])</span></code></pre></div>
 <pre><code>## 
@@ -777,6 +778,7 @@ pre code {
 ## sample estimates:
 ##       cor 
 ## 0.8891069</code></pre>
+<p>This is the correlation comparing the human-ratings to model predictions for the no-emotion condition:</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># correlation within no-emotion condition</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(cor_data<span class="sc">$</span>pred[cor_data<span class="sc">$</span>condition <span class="sc">==</span><span class="st">&quot;no-emotion&quot;</span>], cor_data<span class="sc">$</span>actual[cor_data<span class="sc">$</span>condition <span class="sc">==</span><span class="st">&quot;no-emotion&quot;</span>])</span></code></pre></div>
 <pre><code>## 
@@ -790,7 +792,7 @@ pre code {
 ## sample estimates:
 ##       cor 
 ## 0.7093818</code></pre>
-<p>The scatterplot below shows our model’s predictions (normalized) on causal structure, belief, desire, and knowledge against participants’ ratings (normalized):</p>
+<p>The scatter-plot below shows our model’s predictions on causal structure, belief, desire, and knowledge against mean participants’ ratings (normalized). The error bars represent 95% confidence intervals.</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>corplot_tracking <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cor_data, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> actual, <span class="at">color =</span> Condition, <span class="at">shape =</span> Condition))<span class="sc">+</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="fl">3.5</span>) <span class="sc">+</span></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="at">data =</span> cor_data, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">ymin=</span>actual_lower, <span class="at">ymax=</span>actual_upper), <span class="at">width =</span> .<span class="dv">04</span>, <span class="at">size =</span> .<span class="dv">4</span>)<span class="sc">+</span></span>
@@ -812,7 +814,7 @@ pre code {
 </div>
 <div id="plotting-human-model-comparisons-across-measurement-points" class="section level2" number="4.2">
 <h2 number="4.2"><span class="header-section-number">4.2</span> Plotting Human-Model Comparisons across Measurement Points</h2>
-<p>The line graphs below compares our model’s predictions (normalized) on causal inference against participants’ ratings (normalized). Predictions and ratings for the emotion condition are shown on the top row, whereas predictions and ratings for the no-emotion condition are illustrated on the bottom row.</p>
+<p>The line graphs below compares our model’s predictions on causal inference against mean participants’ ratings (normalized) of 3 causal hypotheses (“blue box”, “orange box”, “both boxes”) at 5 different key moments of the multiple-causes scenario. Graphs for the emotion condition are shown on the top row, whereas graphs for the no-emotion condition are illustrated on the bottom row. The error bars represent 95% confidence intervals.</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>tracking.plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>cause_time_data, <span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>mean, <span class="at">group=</span>Subject, <span class="at">color=</span>Subject, <span class="at">shape=</span>Subject)) <span class="sc">+</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">3</span>)<span class="sc">+</span></span>

@@ -292,7 +292,7 @@ cause_time_data$time <- cause_time_data$time + c( rep(.1,30),  rep(-.1,30))
 ```
 ## Correlation and Scatterplot
 
-The correlation between our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized) are shown below:
+The correlation between our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (normalized) are shown below:
 ```{r computing-correlation}
 cause_cor_data <- cause_time_data
 cause_cor_data$time <- cause_cor_data$time -c( rep(.1,30),  rep(-.1,30))
@@ -311,14 +311,26 @@ cor_data <- full_join(model_cor_data[,c("id","pred","Condition","pred_lower","pr
 # overall correlation
 cor.test(cor_data$pred,cor_data$actual)
 
+```
+
+This is the correlation comparing the human-ratings to model predictions for the emotion condition:
+
+```{r computing-correlation-emotion}
+
 # correlation within emotion condition
 cor.test(cor_data$pred[cor_data$condition =="emotion"], cor_data$actual[cor_data$condition =="emotion"])
+
+```
+
+This is the correlation comparing the human-ratings to model predictions for the no-emotion condition:
+
+```{r computing-correlation-no-emotion}
 
 # correlation within no-emotion condition
 cor.test(cor_data$pred[cor_data$condition =="no-emotion"], cor_data$actual[cor_data$condition =="no-emotion"])
 ```
 
-The scatterplot below shows our model's predictions (normalized) on causal structure, belief, desire, and knowledge against participants' ratings (normalized):
+The scatter-plot below shows our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (normalized). The error bars represent 95% confidence intervals.
 ```{r plotting-scatterplot, fig.height = 8, fig.width=8}
 corplot_tracking <- ggplot(cor_data, aes(x = pred, y = actual, color = Condition, shape = Condition))+
   geom_point(size=3.5) +
@@ -342,7 +354,7 @@ corplot_tracking
 
 ## Plotting Human-Model Comparisons across Measurement Points
 
-The line graphs below compares our model's predictions (normalized) on causal inference against participants' ratings (normalized). Predictions and ratings for the emotion condition are shown on the top row, whereas predictions and ratings for the no-emotion condition are illustrated on the bottom row.
+The line graphs below compares our model's predictions on causal inference against mean participants' ratings (normalized) of 3 causal hypotheses ("blue box", "orange box", "both boxes") at 5 different key moments of the multiple-causes scenario. Graphs for the emotion condition are shown on the top row, whereas graphs for the no-emotion condition are illustrated on the bottom row. The error bars represent 95% confidence intervals.
 ```{r plotting-tracking-plot, fig.height = 8, fig.width=12}
 tracking.plot <- ggplot(data=cause_time_data, aes(x=time, y=mean, group=Subject, color=Subject, shape=Subject)) +
   geom_line() +
