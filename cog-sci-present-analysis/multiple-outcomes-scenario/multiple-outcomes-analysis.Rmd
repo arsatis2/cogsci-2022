@@ -11,7 +11,7 @@ output:
     toc_depth: 3
     toc_float: yes
     code_folding: "hide"
-fontsize: 16pt
+fontsize: 18pt
 ---
 
 ```{r setup, include=FALSE}

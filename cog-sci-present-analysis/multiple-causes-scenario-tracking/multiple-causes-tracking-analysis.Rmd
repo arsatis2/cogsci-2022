@@ -9,8 +9,9 @@ output:
     highlight: tango
     toc: yes
     toc_depth: 3
+    toc_float: true
     code_folding: "hide"
-fontsize: 16pt
+fontsize: 18pt
 ---
 
 ```{r setup, include=FALSE}
