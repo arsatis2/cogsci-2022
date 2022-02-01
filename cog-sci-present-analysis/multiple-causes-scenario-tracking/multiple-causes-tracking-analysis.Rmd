@@ -1,5 +1,5 @@
 ---
-title: "Analysis of Multiple-Causes Tracking Scenario (Follow-up from Study 1)"
+title: "Analysis of Multiple-Causes Tracking Scenario (Study 1b)"
 author: "Dennis and Zheng Yong"
 output:
   html_document:
@@ -154,11 +154,11 @@ key_variables1 <- c("relation1BlueNorm", "relation1OrangeNorm", "relation1Orange
                     "relation4BlueNorm", "relation4OrangeNorm", "relation4OrangeBlueNorm",
                     "relation5BlueNorm", "relation5OrangeNorm", "relation5OrangeBlueNorm")
 
-table1 <- ecl_dat[,key_variables1] %>%
-  describe()%>%
-  as.data.frame()%>%
-  select(n,mean,sd,median,min,max,skew,kurtosis)
-knitr::kable(table1)
+# table1 <- ecl_dat[,key_variables1] %>%
+#   describe()%>%
+#   as.data.frame()%>%
+#   select(n,mean,sd,median,min,max,skew,kurtosis)
+# knitr::kable(table1)
 
 ```
 
@@ -293,7 +293,7 @@ cause_time_data$time <- cause_time_data$time + c( rep(.1,30),  rep(-.1,30))
 ```
 ## Correlation and Scatterplot
 
-The correlation between our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (normalized) are shown below:
+The correlation between our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (causal and belief ratings were normalized to sum to 1 within each participant) are shown below:
 ```{r computing-correlation}
 cause_cor_data <- cause_time_data
 cause_cor_data$time <- cause_cor_data$time -c( rep(.1,30),  rep(-.1,30))
@@ -332,7 +332,7 @@ cor.test(cor_data$pred[cor_data$condition =="no-emotion"], cor_data$actual[cor_d
 ```
 
 The scatter-plot below shows our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (normalized). The error bars represent 95% confidence intervals.
-```{r plotting-scatterplot, fig.height = 8, fig.width=8}
+```{r plotting-scatterplot, fig.height = 10, fig.width=10}
 corplot_tracking <- ggplot(cor_data, aes(x = pred, y = actual, color = Condition, shape = Condition))+
   geom_point(size=3.5) +
   geom_errorbar(data = cor_data, aes(x = pred, ymin=actual_lower, ymax=actual_upper), width = .04, size = .4)+
@@ -345,8 +345,8 @@ corplot_tracking <- ggplot(cor_data, aes(x = pred, y = actual, color = Condition
   xlab("Model Predictions")+
   ggtitle("Multiple-Causes Tracking (Study 1)")+
   theme_bw()+
-    theme(text = element_text(size = 20),
-        plot.title = element_text(face = "bold", size = 20, hjust = 0.5)) +
+    theme(text = element_text(size = 32),
+        plot.title = element_text(face = "bold", size = 32, hjust = 0.5)) +
   annotate("text", x=.25, y=.6, label= "r = .75", size = 6) 
 
 corplot_tracking
@@ -356,7 +356,7 @@ corplot_tracking
 ## Plotting Human-Model Comparisons across Measurement Points
 
 The line graphs below compares our model's predictions on causal inference against mean participants' ratings (normalized) of 3 causal hypotheses ("blue box", "orange box", "both boxes") at 5 different key moments of the multiple-causes scenario. Graphs for the emotion condition are shown on the top row, whereas graphs for the no-emotion condition are illustrated on the bottom row. The error bars represent 95% confidence intervals.
-```{r plotting-tracking-plot, fig.height = 8, fig.width=12}
+```{r plotting-tracking-plot, fig.height = 10, fig.width=14}
 tracking.plot <- ggplot(data=cause_time_data, aes(x=time, y=mean, group=Subject, color=Subject, shape=Subject)) +
   geom_line() +
   geom_point(size=3)+
@@ -365,8 +365,10 @@ tracking.plot <- ggplot(data=cause_time_data, aes(x=time, y=mean, group=Subject,
   xlab("Measurement Points")+
   ylab("Causal Ratings")+
   theme_bw() +
-  theme(text = element_text(size = 16),
-        plot.title = element_text(face = "bold", size = 16, hjust = 0.5))
+  theme(text = element_text(size = 24),
+        plot.title = element_text(face = "bold", size = 24, hjust = 0.5),
+        legend.position = "top",
+        legend.title=element_blank())
 tracking.plot
 ```
 
