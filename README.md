@@ -1,4 +1,4 @@
-# Modelling Causal Inference from Emotional Displays
+# Modeling Causal Inference from Emotional Displays
 
 This GitHub repository contains the source code and data analysis for the CogSci 2022 submission, titled "Modelling Causal Inference from Emotional Displays".
 
