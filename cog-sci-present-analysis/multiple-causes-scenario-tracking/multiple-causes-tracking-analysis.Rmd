@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Multiple-Causes Tracking Scenario (Study 1b)"
-author: "Dennis and Zheng Yong"
+author: "Anonymous"
 output:
   html_document:
     df_print: paged
