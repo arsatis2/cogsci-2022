@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Multiple-Causes Scenario (Study 1a)"
-author: "Dennis and Zheng Yong"
+author: "Anonymous"
 output:
   html_document:
     df_print: paged
