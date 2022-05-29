@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Multiple-Causes Scenario (Study 1a)"
-author: "Anonymous"
+author: "Dennis W. H. Teo and Zheng Yong Ang"
 output:
   html_document:
     df_print: paged
@@ -321,14 +321,14 @@ model_cause <- data.frame(
                 "no-emotion","no-emotion","no-emotion"),
   Hypothesis = c("Blue Box Only",  "Orange Box Only","Both Boxes",
                 "Blue Box Only",  "Orange Box Only","Both Boxes"),
-  ci_lower_pred = c(0.076   , 0.405975, 0.438,
-                    0.018   , 0.293975, 0.622
+  ci_lower_pred = c(0.027   , 0.356   , 0.544975,
+                    0.025   , 0.381975, 0.522
                     ),
-  ci_upper_pred = c(0.113   , 0.466025, 0.499,
-                    0.037025, 0.35    , 0.679025
+  ci_upper_pred = c(0.051, 0.417, 0.604,
+                    0.049   , 0.442   , 0.581025
                     ),
-  mean_pred = c(0.0955,   0.436125, 0.468375,
-                0.0275, 0.3215, 0.651
+  mean_pred = c(0.038875, 0.387125, 0.574,
+                0.036,    0.412875, 0.551125
                 ),
   Subject = c("Model", "Model","Model", "Model","Model", "Model"),
   labels = c("W","W","W",
@@ -349,14 +349,14 @@ model_expectation <- data.frame(
                 "no-emotion","no-emotion","no-emotion"),
   Hypothesis = c("Blue Box Only", "Orange Box Only", "Both Boxes",
                 "Blue Box Only", "Orange Box Only", "Both Boxes"),
-  ci_lower_pred = c(0.391, 0.253, 0.274,
-                    0.057, 0.241, 0.63
+  ci_lower_pred = c(0.078, 0.311975, 0.532,
+                    0.079, 0.332,    0.512
                     ),
-  ci_upper_pred = c(0.449   , 0.306025, 0.328,
-                    0.089, 0.298, 0.689
+  ci_upper_pred = c(0.116,    0.369, 0.594,
+                    0.116025, 0.39,  0.570025
                     ),
-  mean_pred = c(0.42,   0.2795, 0.3005,
-                0.072375, 0.268625, 0.659 
+  mean_pred = c(0.096375, 0.340125, 0.5635,
+                0.097875, 0.36125,  0.540875
                 ),
   Subject = c("Model", "Model","Model", "Model","Model", "Model"),
   labels = c("B","B","B",
@@ -371,39 +371,21 @@ human_desire$key <- c("de","dn")
 
 model_desire <- data.frame(
   condition = c("emotion", "no-emotion"),
-  ci_lower_pred = c(0.9148305084745767,0.5571428571428572),
-  ci_upper_pred = c(1.0, 0.7857142857142857),
-  mean_pred = c(0.96125,0.6735),
+  ci_lower_pred = c(0.3559322033898305, 0.3142857142857143),
+  ci_upper_pred = c(0.6101694915254238, 0.5428571428571428),
+  mean_pred = c(0.47525, 0.43175),
   Subject = c("Model", "Model"),
   labels = c("D", "D"),
   key = c("de","dn")
 )
 
-
-human_knowledge$Subject <- "Human"
-human_knowledge$labels <- c("K", "K")
-human_knowledge$key <- c("ke","kn")
-
-model_knowledge <- data.frame(
-  condition = c("emotion", "no-emotion"),
-  ci_lower_pred = c(0.652382863412051, 0.689338574660182),
-  ci_upper_pred = c(0.7343752532197032, 0.7614024391721229),
-  mean_pred = c(0.6938197847847518, 0.7250887688272029),
-  Subject = c("Model", "Model"),
-  labels = c("K", "K"),
-  key = c("ke","kn")
-)
-
-
-human_variable_data <- human_desire %>%
+human_variable_data <- human_cause %>%
   full_join(human_expectation)%>%
-  full_join(human_knowledge)%>%
-  full_join(human_cause)
+  full_join(human_desire)
 
-model_variable_data <- model_desire %>%
+model_variable_data <- model_cause %>%
   full_join(model_expectation)%>%
-  full_join(model_knowledge)%>%
-  full_join(model_cause)
+  full_join(model_desire)
 
 all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","Hypothesis","labels","condition"))
 
@@ -416,7 +398,21 @@ The correlation between our model's predictions on causal structure, belief, des
 ```{r computing-correlation}
 cor.test(all_variable_data$mean, all_variable_data$mean_pred)
 ```
+```{r computing-correlation-no-desire}
+human_variable_data <- human_cause %>%
+  full_join(human_expectation)
 
+model_variable_data <- model_cause %>%
+  full_join(model_expectation)
+
+all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","Hypothesis","labels","condition"))
+
+all_variable_data$Condition <-factor(all_variable_data$condition,
+                                     levels=c("emotion","no-emotion"),
+                                     labels = c("Emotion","No Emotion"))
+
+cor.test(all_variable_data$mean, all_variable_data$mean_pred)
+```
 The scatter-plot below plots our model's predictions on causal structure, belief, desire, and knowledge against mean participants' ratings (belief and causal ratings were normalized to sum to 1). The error bars represent 95% confidence intervals):
 ```{r plotting-scatterplot, fig.height=10, fig.width=10}
 corplot1 <- ggplot(all_variable_data, aes(x = mean_pred, y = mean, color = Condition, shape = Condition))+

@@ -1,6 +1,6 @@
 ---
 title: "Analysis of Multiple-Outcomes Scenario (Study 2)"
-author: "Anonymous"
+author: "Dennis W. H. Teo and Zheng Yong Ang"
 output:
   html_document:
     df_print: paged
@@ -376,29 +376,13 @@ model_desire <- data.frame(
   key = c("d1e","d2e","d1n","d2n")
 )
 
-human_knowledge$Subject <- "Human"
-human_knowledge$labels <- c("K", "K")
-human_knowledge$key <- c("ke","kn")
-
-model_knowledge <- data.frame(
-  condition = c("emotion", "no-emotion"),
-  ci_lower_pred = c(0.6046379468896996,0.673375162642256),
-  ci_upper_pred = c(0.684843689631173, 0.7542611779781163),
-  mean_pred = c(0.6438598614053981,0.7140678680064141),
-  Subject = c("Model", "Model"),
-  labels = c("K", "K"),
-  key = c("ke","kn")
-)
-
-human_variable_data <- human_desire %>%
+human_variable_data <- human_cause %>%
   full_join(human_expectation)%>%
-  full_join(human_knowledge)%>%
-  full_join(human_cause)
+  full_join(human_desire)
 
-model_variable_data <- model_desire %>%
+model_variable_data <- model_cause %>%
   full_join(model_expectation)%>%
-  full_join(model_knowledge)%>%
-  full_join(model_cause)
+  full_join(model_desire)
 
 all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","labels","condition"))
 
@@ -409,6 +393,22 @@ all_variable_data$Condition <-factor(all_variable_data$condition,
 
 The correlation between our model's predictions on causal structure, belief, desire, and knowledge against participants' mean ratings (normalized) are shown below:
 ```{r computing-correlation}
+cor.test(all_variable_data$mean, all_variable_data$mean_pred)
+```
+
+```{r computing-correlation-no-desire}
+human_variable_data <- human_cause %>%
+  full_join(human_expectation)
+
+model_variable_data <- model_cause %>%
+  full_join(model_expectation)
+
+all_variable_data <- full_join(human_variable_data, model_variable_data, by = c("key","Hypothesis","labels","condition"))
+
+all_variable_data$Condition <-factor(all_variable_data$condition,
+                                     levels=c("emotion","no-emotion"),
+                                     labels = c("Emotion","No Emotion"))
+
 cor.test(all_variable_data$mean, all_variable_data$mean_pred)
 ```
 
